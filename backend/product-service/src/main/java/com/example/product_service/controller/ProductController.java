@@ -1,6 +1,7 @@
 package com.example.product_service.controller;
 
-import com.example.product_service.entity.Product;
+import com.example.product_service.dto.ProductRequest;
+import com.example.product_service.dto.ProductResponse;
 import com.example.product_service.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<Product> getAll(
+    public List<ProductResponse> getAll(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long brandId,
             @RequestParam(required = false) String search) {
@@ -39,30 +40,24 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getById(@PathVariable Long id) {
-        return service.getById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ProductResponse getById(@PathVariable Long id) {
+        return service.getById(id);
     }
 
     @PostMapping
-    public ResponseEntity<Product> create(@Valid @RequestBody Product product) {
-        Product created = service.create(product);
+    public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
+        ProductResponse created = service.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> update(@PathVariable Long id, @Valid @RequestBody Product product) {
-        return service.update(id, product)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ProductResponse update(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
+        return service.update(id, request);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (service.delete(id)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
